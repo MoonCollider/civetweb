@@ -19979,14 +19979,14 @@ consume_socket(struct mg_context *ctx,
 	if (ctx->sq_head > ctx->sq_tail) {
 		/* Copy socket from the queue and increment tail */
 		*sp = ctx->squeue[ctx->sq_tail % ctx->sq_size];
-		ctx->sq_tail++;
+		ctx->sq_tail = ctx->sq_tail + 1;
 
 		DEBUG_TRACE("grabbed socket %d, going busy", sp ? sp->sock : -1);
 
 		/* Wrap pointers if needed */
 		while (ctx->sq_tail > ctx->sq_size) {
-			ctx->sq_tail -= ctx->sq_size;
-			ctx->sq_head -= ctx->sq_size;
+			ctx->sq_tail = ctx->sq_tail - ctx->sq_size;
+			ctx->sq_head = ctx->sq_head - ctx->sq_size;
 		}
 	}
 
@@ -20026,7 +20026,7 @@ produce_socket(struct mg_context *ctx, const struct socket *sp)
 	if (queue_filled < ctx->sq_size) {
 		/* Copy socket to the queue and increment head */
 		ctx->squeue[ctx->sq_head % ctx->sq_size] = *sp;
-		ctx->sq_head++;
+		ctx->sq_head = ctx->sq_head + 1;
 		DEBUG_TRACE("queued socket %d", sp ? sp->sock : -1);
 	}
 
